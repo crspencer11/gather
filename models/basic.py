@@ -7,9 +7,9 @@ class DataSource:
         self.base_url = base_url
         self._home_page = self._create_home_page()
         self._total_pages = self._find_last_page()
-        self._storage = DefaultDict(list) = {}
+        self._storage =  {}
 
-    def _create_home_page(self):
+    def _create_home_page(self) -> BeautifulSoup:
         home = requests.get(self.base_url)
         return BeautifulSoup(home.text, 'html.parser')
 
@@ -28,18 +28,22 @@ class DataSource:
 
     def gather_data(self):
         print("Gathering Data...")
-        pages = []
+        paginated_urls = []
         total_pages = self._total_pages
         for page_num in range(1, total_pages):
-            pages.append(self.base_url+"?page="+str(page_num))
+            paginated_urls.append(self.base_url+"?page="+str(page_num))
 
-        for page in pages:
-            print(f"Scrapping data from Page {page}")
-            current_page = requests.get(page)
+        for page_url in paginated_urls:
+            self._get_coins(page_url)
 
-    def get_coins(self, page):
-        for row in page.find_all('tr'):
-            name = row.find('p', class_='coin-item-symbol')
-            if name and name not in self._storage:
-                print(name.text)
-                self._storage[name] = row
+    def _get_coins(self, paginated_url: str):
+        print(f"Scrapping data from {paginated_url}")
+        page = requests.get(paginated_url)
+        html_page = BeautifulSoup(page.text, 'html.parser')
+        for row in html_page.find_all('tr'):
+            symbol = row.find('span', class_='crypto-symbol')
+            name_tag = row.find_all('span')
+            name = name_tag[1].text if len(name_tag) > 1 else None
+            print(f"Name: {name}, Symbol: {symbol.text if symbol else None}")            # price = row.find('p', class='')
+            # if name and name not in self._storage:
+            #     self._storage[name] = 

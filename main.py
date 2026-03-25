@@ -1,4 +1,5 @@
 from models.basic import *
 
 cmc = 'https://coinmarketcap.com/'
-DataSource(cmc)
+obj = DataSource(cmc)
+obj.gather_data()
