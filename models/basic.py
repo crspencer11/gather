@@ -7,11 +7,16 @@ class DataSource:
         self.base_url = base_url
         self._home_page = self._create_home_page()
         self._total_pages = self._find_last_page()
+        self._headers = []
         self._storage =  {}
 
     def _create_home_page(self) -> BeautifulSoup:
         home = requests.get(self.base_url)
-        return BeautifulSoup(home.text, 'html.parser')
+        if self._home_page == None:
+            self._home_page = BeautifulSoup(home.text, 'html.parser')
+        headers = self._home_page.find_all('p', class_="sc-71024e3e-0 fSsxNG")
+        self.headers.append(headers)
+        return 
 
     def _find_last_page(self) -> int:
         """
@@ -45,9 +50,9 @@ class DataSource:
         return table
 
     def find_headers(self, page_table: Tag):
-        # print(page_table)
         headers = page_table.find_all('p', class_="sc-71024e3e-0 fSsxNG")
-        print(headers)
+        for header in headers:
+            self._headers.append()
 
     def _get_coins(self, paginated_url: str) -> Tag:
         print(f"Scrapping data from {paginated_url}")
